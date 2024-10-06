@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"context"
@@ -9,12 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
+var Client *mongo.Client
 
-// initMongoDB initializes the MongoDB client
-func initMongoDB() {
+func InitMongoDB() {
 	var err error
-	client, err = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	Client, err = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,7 +21,7 @@ func initMongoDB() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err = client.Connect(ctx)
+	err = Client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}

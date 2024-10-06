@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"context"
@@ -7,21 +7,22 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
+	"go.mongodb.org/mongo-driver/bson"
+	"backend/models"  // Adjusted import path
+	"backend/config"  // Adjusted import path
 )
 
-func register(c *gin.Context) {
-	var user User
+func Register(c *gin.Context) {
+	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Hash password
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 
-	collection := client.Database("auth_demo").Collection("users")
+	collection := config.Client.Database("auth_demo").Collection("users")
 	_, err := collection.InsertOne(context.Background(), bson.M{
 		"username": user.Username,
 		"password": string(hashedPassword),
@@ -35,15 +36,15 @@ func register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
 }
 
-func login(c *gin.Context) {
-	var user User
+func Login(c *gin.Context) {
+	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	collection := client.Database("auth_demo").Collection("users")
-	var foundUser User
+	collection := config.Client.Database("auth_demo").Collection("users")
+	var foundUser models.User
 	err := collection.FindOne(context.Background(), bson.M{"username": user.Username}).Decode(&foundUser)
 
 	if err != nil {
@@ -57,7 +58,6 @@ func login(c *gin.Context) {
 		return
 	}
 
-	// Generate JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),

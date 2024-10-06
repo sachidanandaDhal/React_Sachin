@@ -1,25 +1,25 @@
-
 package main
-
 import (
+	"log"
+
+	"backend/config" // Adjusted import path
+	"backend/routes" // Adjusted import path
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Initialize MongoDB
-	initMongoDB()
-
-	// Initialize Gin router
+	config.InitMongoDB()
 	r := gin.Default()
 
-	// Enable CORS
+	// Enable CORS for all routes
 	r.Use(cors.Default())
 
-	// Define routes
-	r.POST("/register", register)
-	r.POST("/login", login)
+	// Set up routes
+	routes.SetupRoutes(r)
 
-	// Run server
-	r.Run(":5000")
+	if err := r.Run(":5000"); err != nil {
+		log.Fatal("Server run failed:", err)
+	}
 }
