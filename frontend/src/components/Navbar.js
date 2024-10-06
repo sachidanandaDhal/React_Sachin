@@ -1,17 +1,30 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/car2.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [username, setUsername] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Retrieve the username from local storage or decode from the token
+    const token = localStorage.getItem("token");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT to get user info
+      setUsername(payload.username);
+    }
+  }, []);
+  
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const handleSignOut = () => {
+    localStorage.removeItem("token");
+    setUsername(null);
     navigate("/login");
     console.log("Signed out");
   };
@@ -63,7 +76,7 @@ const Navbar = () => {
                 clip-rule="evenodd"
               />
             </svg>
-            Account
+            {username ? `Hi, ${username}` : "Account"}
           </button>
         </div>
 
