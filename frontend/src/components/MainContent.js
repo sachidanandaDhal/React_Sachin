@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import CreateNew from "./CreateNew.js";
+import UserData from './UserData';
 
 
 const MainContent = () => {
@@ -51,82 +52,7 @@ const MainContent = () => {
 
       <section className="bg-white p-6 rounded shadow">
         <h3 className="text-lg font-bold mb-4">Recent orders</h3>
-        <table className="w-full table-auto">
-          <thead>
-            <tr>
-              <th className="text-left p-2">Order number</th>
-              <th className="text-left p-2">Purchase date</th>
-              <th className="text-left p-2">Customer</th>
-              <th className="text-left p-2">Event</th>
-              <th className="text-left p-2">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              },
-              {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              }, {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              }, {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              }, {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              },
-              {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              },
-              {
-                orderNumber: 3000,
-                date: "May 9, 2024",
-                customer: "Leslie Alexander",
-                event: "Bear Hug: Live in Concert",
-                amount: "$80.00",
-              },
-             
-            ].map((order, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-100 cursor-pointer"
-                onClick={() => {
-                  /* Handle order click */
-                }}
-              >
-                <td className="p-2">{order.orderNumber}</td>
-                <td className="p-2">{order.date}</td>
-                <td className="p-2">{order.customer}</td>
-                <td className="p-2">{order.event}</td>
-                <td className="p-2">{order.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <UserData />
       </section>
       {isModalOpen && <CreateNew closeModal={closeModal} />}
     </div>

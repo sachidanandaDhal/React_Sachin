@@ -1,4 +1,93 @@
+// import React, { useState } from "react";
+
+// const CreateNew = ({ closeModal }) => {
+//   const [file, setFile] = useState(null);
+//   const [formValues, setFormValues] = useState({
+//     name: '',
+//     mobile: '',
+//     email: '',
+//     date: '',
+//     insuranceType: '',
+//     renewalType: '',
+//     vehicleType: '',
+//     vehicleRegNo: '',
+//     vehicleDate: '',
+//     makeModel: '',
+//     premiumAmount: '',
+//     paymentMode: '',
+//     agentName: '',
+//     agentContact: '',
+//     agentEmail: '',
+//   });
+
+//   const [errors, setErrors] = useState({});
+
+//   // Handle file upload
+//   const handleFileUpload = (event) => {
+//     setFile(event.target.files[0]);
+//   };
+
+//   // Handle input change
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormValues((prev) => ({ ...prev, [name]: value }));
+
+//     // Update error state if the input is cleared
+//     if (value.length === 0) {
+//       setErrors((prev) => ({ ...prev, [name]: true }));
+//     } else {
+//       // Remove error for this field if it has a value
+//       setErrors((prev) => ({ ...prev, [name]: false }));
+//     }
+//   };
+
+//   // Validate form fields
+//   const validateFields = () => {
+//     const newErrors = {};
+//     Object.keys(formValues).forEach((key) => {
+//       if (!formValues[key]) {
+//         newErrors[key] = true; // Set error if field is empty
+//       }
+//     });
+//     if (!file) {
+//       newErrors.file = true; // Check if a file is uploaded
+//     }
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0; // Return true if no errors
+//   };
+
+//   // Handle form submission
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!validateFields()) {
+//       alert("Please fill in all fields.");
+//       return;
+//     }
+//     alert("Form Submitted");
+//     // Reset form values and errors after submission if needed
+//     setFormValues({
+//       name: '',
+//       mobile: '',
+//       email: '',
+//       date: '',
+//       insuranceType: '',
+//       renewalType: '',
+//       vehicleType: '',
+//       vehicleRegNo: '',
+//       vehicleDate: '',
+//       makeModel: '',
+//       premiumAmount: '',
+//       paymentMode: '',
+//       agentName: '',
+//       agentContact: '',
+//       agentEmail: '',
+//     });
+//     setErrors({});
+//   };
+
+
 import React, { useState } from "react";
+import axios from "axios";
 
 const CreateNew = ({ closeModal }) => {
   const [file, setFile] = useState(null);
@@ -57,13 +146,34 @@ const CreateNew = ({ closeModal }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateFields()) {
       alert("Please fill in all fields.");
       return;
     }
-    alert("Form Submitted");
+
+    // Prepare form data for submission
+    const dataToSubmit = {
+      ...formValues,
+      // If you want to include the file, you might need to handle that differently (e.g., via FormData)
+      // file, // Uncomment this if you want to handle file upload
+    };
+
+    try {
+      const token = localStorage.getItem('token'); // Assuming token is stored in local storage
+      const response = await axios.post('http://localhost:5000/save-user-data', dataToSubmit, {
+        headers: {
+          Authorization: `Bearer ${token}`,  // Include token in headers
+        },
+      });
+      alert(response.data.message); // Notify the user of the success
+      // Optionally close modal or reset state here
+      closeModal(); // Call closeModal if you want to close the modal after submission
+    } catch (error) {
+      alert(error.response?.data?.error || "An error occurred while saving data.");
+    }
+
     // Reset form values and errors after submission if needed
     setFormValues({
       name: '',
@@ -295,7 +405,7 @@ const CreateNew = ({ closeModal }) => {
                     name="file"
                     onChange={handleFileUpload}
                     className={`w-full bg-transparent placeholder:text-gray-400 text-gray-700 text-sm border ${errors.file ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-blue-600 hover:border-gray-600 shadow-sm focus:shadow`}
-                    required
+                    // required
                   />
                   {errors.file && <p className="text-red-500 text-sm">File upload is mandatory</p>}
                 </div>

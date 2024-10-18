@@ -13,48 +13,74 @@ import (
 	"backend/config"  // Adjusted import path
 )
 
+// Register handles user registration and returns a structured JSON response.
 func Register(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to hash password",
+		})
+		return
+	}
 
 	collection := config.Client.Database("auth_demo").Collection("users")
-	_, err := collection.InsertOne(context.Background(), bson.M{
+	_, err = collection.InsertOne(context.Background(), bson.M{
 		"username": user.Username,
 		"password": string(hashedPassword),
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to register user",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Registration successful",
+	})
 }
 
+// Login function to authenticate the user and return a JWT token with a structured JSON response.
 func Login(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	collection := config.Client.Database("auth_demo").Collection("users")
 	var foundUser models.User
 	err := collection.FindOne(context.Background(), bson.M{"username": user.Username}).Decode(&foundUser)
-
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid credentials",
+		})
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(user.Password))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid credentials",
+		})
 		return
 	}
 
@@ -65,9 +91,15 @@ func Login(c *gin.Context) {
 
 	tokenString, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to generate token",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"token":   tokenString,
+	})
 }
