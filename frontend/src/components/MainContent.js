@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import CreateNew from "./CreateNew.js";
-import UserData from './UserData';
+import InsuranceData from './InsuranceData';
 
 
 const MainContent = () => {
@@ -52,7 +52,7 @@ const MainContent = () => {
 
       <section className="bg-white p-6 rounded shadow">
         <h3 className="text-lg font-bold mb-4">Recent orders</h3>
-        <UserData />
+        <InsuranceData />
       </section>
       {isModalOpen && <CreateNew closeModal={closeModal} />}
     </div>
